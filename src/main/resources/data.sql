@@ -17,6 +17,6 @@ INSERT INTO Customer (name) VALUES ('Bob Brown');
 
 -- Insert into MovieRental
 INSERT INTO MovieRental (days, customer_id, movie_id) VALUES (3, 1, 'F001');
-INSERT INTO MovieRental (days, customer_id, movie_id) VALUES (1, 2, 'F002');
+INSERT INTO MovieRental (days, customer_id, movie_id) VALUES (1, 1, 'F002');
 INSERT INTO MovieRental (days, customer_id, movie_id) VALUES (8, 3, 'F003');
 INSERT INTO MovieRental (days, customer_id, movie_id) VALUES (3, 4, 'F004');
