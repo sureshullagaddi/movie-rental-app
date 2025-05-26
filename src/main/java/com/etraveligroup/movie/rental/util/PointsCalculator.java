@@ -9,10 +9,10 @@ public final class PointsCalculator {
         throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
 
-    public static int calculateFrequentRenterPoints(MovieType movieType, int daysRented) {
-        if (movieType == null) {
-            throw new IllegalArgumentException("Movie type must not be null");
+    public static int calculateFrequentRenterPoints(String pricingCode, int daysRented) {
+        if (pricingCode == null) {
+            throw new IllegalArgumentException("Pricing code must not be null");
         }
-        return (movieType == MovieType.NEW && daysRented > 2) ? 2 : 1;
+        return ("new".equalsIgnoreCase(pricingCode) && daysRented > 2) ? 2 : 1;
     }
 }

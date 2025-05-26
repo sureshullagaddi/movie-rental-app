@@ -43,6 +43,10 @@ dependencies {
 	//Database Dependencies
 	runtimeOnly 'com.h2database:h2:'
 
+	//MariaDB Database dependency
+	implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
+
+
 	//Logging Dependencies
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

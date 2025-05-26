@@ -6,16 +6,24 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import jakarta.persistence.*;
+
+import java.io.Serializable;
+
 @Entity
-@Table(name = "movies")
 @Data
-public class Movie {
+@Table(name = "Movie")
+public class Movie implements Serializable {
+
     @Id
+    @Column(name = "id")
     private String id;
 
-    @Column(nullable = false)
+    @Column(name = "title")
     private String title;
 
-    @Column(name = "movie_type", nullable = false)
-    private String movieType;
+    @ManyToOne
+    @JoinColumn(name = "code", referencedColumnName = "code")
+    private MoviePricing pricing;
 }
+

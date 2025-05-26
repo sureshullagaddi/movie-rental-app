@@ -3,23 +3,26 @@ package com.etraveligroup.movie.rental.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Entity
-@Table(name = "movie_rentals")
 @Data
-public class MovieRental {
+@Table(name = "MovieRental")
+public class MovieRental implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
+    @Column(name = "days")
+    private int days;
+
     @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
+    @JoinColumn(name = "movie_id")
     private Movie movie;
-
-    @Column(nullable = false)
-    private int days;
 }
