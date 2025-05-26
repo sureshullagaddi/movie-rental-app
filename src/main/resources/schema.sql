@@ -1,0 +1,20 @@
+
+CREATE TABLE IF NOT EXISTS movies (
+    id VARCHAR(10) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    movie_type VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS customers (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS movie_rentals (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    customer_id BIGINT NOT NULL,
+    movie_id VARCHAR(10) NOT NULL,
+    days INT NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id),
+    FOREIGN KEY (movie_id) REFERENCES movies(id)
+);
