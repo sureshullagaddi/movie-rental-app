@@ -47,8 +47,10 @@ dependencies {
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
 
 	//pdf generation dependency
-	implementation 'com.itextpdf:kernel:8.0.2'
-	implementation 'com.itextpdf:layout:8.0.2'
+	//implementation 'com.itextpdf:kernel:8.0.2'
+	//implementation 'com.itextpdf:layout:8.0.2'
+	implementation 'com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 	// Cache Dependencies
 	implementation 'org.springframework.boot:spring-boot-starter-cache'

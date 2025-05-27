@@ -6,12 +6,6 @@ import java.math.BigDecimal;
  * Utility class for formatting invoice details.
  * Provides methods to format the header, line items, and footer of an invoice.
  * This class is designed to be used in conjunction with the RentalInfoService
- * to generate a formatted invoice string for a customer's movie rentals.
- * It includes methods to format the header with the customer's name,
- * format each line item with the movie title and rental amount,
- * and format the footer with the total amount owed and frequent renter points earned.
- * The methods return formatted strings that can be used to create a complete invoice.
- * This class is not intended to be instantiated, as it only contains static methods.
  * @author Suresh
  * @version 1.0
  * @since 1.0

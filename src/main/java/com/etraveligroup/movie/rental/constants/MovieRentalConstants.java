@@ -1,9 +1,7 @@
 package com.etraveligroup.movie.rental.constants;
 
-import java.math.BigDecimal;
-
 /**
- * Rental app constants
+ * Movie rental app constants
  */
 public final class MovieRentalConstants {
 

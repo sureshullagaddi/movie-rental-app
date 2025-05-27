@@ -1,6 +1,5 @@
 package com.etraveligroup.movie.rental.controller;
 
-import com.etraveligroup.movie.rental.dto.ErrorResponseDTO;
 import com.etraveligroup.movie.rental.exceptions.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -83,19 +82,6 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Handles movie not found exceptions.
-     * This method captures exceptions when a movie is not found and formats the error message.
-     *
-     * @param ex the MovieNotFoundException containing the error message
-     * @return a ResponseEntity with a NOT_FOUND status and a formatted error message
-     */
-    @ExceptionHandler(MovieNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleMovieNotFound(MovieNotFoundException ex) {
-        ErrorResponseDTO error = new ErrorResponseDTO(HttpStatus.NOT_FOUND.value(), "Movie Not Found", ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
-
-    /**
      * Handles validation exceptions thrown by handler methods.
      * This method captures validation exceptions thrown by handler methods and formats the error message.
      *
@@ -137,8 +123,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    /**
+     * Handles invoice parsing exceptions.
+     * This method captures exceptions related to invoice parsing failures and formats the error message.
+     *
+     * @param ex the InvoiceParsingException containing the error message
+     * @return a ResponseEntity with an internal server error status and a formatted error message
+     */
     @ExceptionHandler(InvoiceParsingException.class)
     public ResponseEntity<String> handleIllegalArgument(InvoiceParsingException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
+    /**
+     * Handles PDF generation exceptions.
+     * This method captures exceptions related to PDF generation failures and formats the error message.
+     * * @param ex the PdfGenerationException containing the error message
+     * * @return a ResponseEntity with an internal server error status and a formatted error message
+     */
+    @ExceptionHandler(PdfGenerationException.class)
+    public ResponseEntity<String> handleIllegalArgument(PdfGenerationException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 

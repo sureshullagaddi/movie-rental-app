@@ -30,3 +30,9 @@ spring:
         mode: always
         schema-locations: classpath:schema.sql
         data-locations: classpath:data.sql
+
+  # Caching configuration
+  cache:
+    cache-names: invoice
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=10m

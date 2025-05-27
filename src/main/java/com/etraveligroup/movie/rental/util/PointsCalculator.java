@@ -2,6 +2,14 @@ package com.etraveligroup.movie.rental.util;
 
 import static com.etraveligroup.movie.rental.constants.MovieRentalConstants.*;
 
+/**
+ * Utility class for calculating frequent renter points based on the movie pricing code and days rented.
+ * This class provides a method to determine the number of points earned for a rental.
+ *
+ * @author Suresh
+ * @version 1.0
+ * @since 1.0
+ */
 public final class PointsCalculator {
 
     private PointsCalculator() {
@@ -12,6 +20,7 @@ public final class PointsCalculator {
         if (pricingCode == null) {
             throw new IllegalArgumentException("Pricing code must not be null");
         }
-        return (NEW.equalsIgnoreCase(pricingCode) && daysRented > DAYS_RENTED_2) ? DAYS_RENTED_2 : DAYS_RENTED_1;
+        // Validate the number of days rented for the NEW pricing code
+        return (NEW.equalsIgnoreCase(pricingCode) && daysRented >= DAYS_RENTED_2) ? DAYS_RENTED_2 : DAYS_RENTED_1;
     }
 }

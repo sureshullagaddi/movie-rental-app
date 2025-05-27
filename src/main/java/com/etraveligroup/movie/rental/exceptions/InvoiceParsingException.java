@@ -5,6 +5,9 @@ package com.etraveligroup.movie.rental.exceptions;
  * This could be due to invalid data format, missing fields, or other parsing issues.
  */
 public class InvoiceParsingException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
     public InvoiceParsingException(String message) {
         super(message);
     }

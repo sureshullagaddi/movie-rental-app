@@ -1,6 +1,6 @@
 package com.etraveligroup.movie.rental.service.impl;
 
-import com.etraveligroup.movie.rental.dto.GenerateInvoiceRequestDTO;
+import com.etraveligroup.movie.rental.dto.GenerateInvoiceByNameRequestDTO;
 import com.etraveligroup.movie.rental.entity.Customer;
 import com.etraveligroup.movie.rental.entity.Movie;
 import com.etraveligroup.movie.rental.entity.MovieRental;
@@ -26,17 +26,36 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service implementation for handling rental information and generating invoices.
+ * This service interacts with the CustomerRepository to retrieve customer data and
+ * processes movie rentals to generate invoices.
+ * It uses caching and retry mechanisms to ensure reliability and performance.
+ * @author Suresh
+ * @version 1.0
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalInfoService {
+
     private final CustomerRepository customerRepository;
 
+    /**
+     * Generates an invoice for a customer based on their name.
+     * The method retrieves the customer from the repository, processes their rentals,
+     * and formats the invoice accordingly.
+     * @param generateInvoiceRequestDTO the request containing customer name
+     * @return a Mono containing the generated invoice as a String
+     * @throws CustomerNotFoundException if the customer is not found in the repository
+     * @throws RentalsNotFoundException if the customer has no rentals
+     * @throws RentalProcessingException if there are errors during rental processing
+     */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Retryable(retryFor = RentalProcessingException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     @Cacheable(value = "invoices", key = "#generateInvoiceRequestDTO.customerName()")
-    public Mono<String> generateInvoiceByName(final GenerateInvoiceRequestDTO generateInvoiceRequestDTO) {
+    public Mono<String> generateInvoiceByName(final GenerateInvoiceByNameRequestDTO generateInvoiceRequestDTO) {
         return Mono.fromCallable(() -> {
             log.info("Starting invoice generation for customer: {}", generateInvoiceRequestDTO.customerName());
             Customer customer = customerRepository.findByName(generateInvoiceRequestDTO.customerName())
@@ -49,6 +68,16 @@ public class RentalServiceImpl implements RentalInfoService {
         });
     }
 
+    /**
+     * Generates an invoice for a customer based on their ID.
+     * The method retrieves the customer from the repository, processes their rentals,
+     * and formats the invoice accordingly.
+     * @param customerId the ID of the customer for whom the invoice is to be generated
+     * @return a Mono containing the generated invoice as a String
+     * @throws CustomerNotFoundException if the customer is not found in the repository
+     * @throws RentalsNotFoundException if the customer has no rentals
+     * @throws RentalProcessingException if there are errors during rental processing
+     */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Retryable(retryFor = RentalProcessingException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))

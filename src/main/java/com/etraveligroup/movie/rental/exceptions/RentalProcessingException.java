@@ -1,6 +1,5 @@
 package com.etraveligroup.movie.rental.exceptions;
 
-import java.io.Serial;
 import java.util.List;
 
 /**
@@ -8,7 +7,6 @@ import java.util.List;
  */
 public class RentalProcessingException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     private final List<String> errors;
