@@ -12,8 +12,8 @@ public final class PriceCalculator {
 
     public static BigDecimal calculateRentalAmount(MoviePricing pricing, int days) {
         int baseDays = pricing.getBaseDays();
-        BigDecimal basePrice = BigDecimal.valueOf(pricing.getBasePrice());
-        BigDecimal extraPricePerDay = BigDecimal.valueOf(pricing.getExtraPricePerDay());
+        BigDecimal basePrice = pricing.getBasePrice();
+        BigDecimal extraPricePerDay = pricing.getExtraPricePerDay();
 
         if (days <= baseDays) {
             return basePrice;

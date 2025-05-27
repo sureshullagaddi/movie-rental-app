@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Entity
 @Data
@@ -18,8 +19,8 @@ public class MoviePricing implements Serializable {
     private int baseDays;
 
     @Column(name = "base_price")
-    private double basePrice;
+    private BigDecimal basePrice;
 
     @Column(name = "extra_price_per_day")
-    private double extraPricePerDay;
+    private BigDecimal extraPricePerDay;
 }

@@ -10,20 +10,13 @@ public final class MovieRentalConstants {
     private MovieRentalConstants() {
         throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
+    // Constants for invoice formatting
+    public static final String NEW = "new";
+    public static final int DAYS_RENTED_2 = 2;
+    public static final int DAYS_RENTED_1 = 1;
 
-    // REGULAR movie
-    public static final BigDecimal BASE_AMOUNT_REGULAR = BigDecimal.valueOf(2);
-    public static final int REGULAR_DAYS_THRESHOLD = 2;
-    public static final BigDecimal EXTRA_RATE_REGULAR = BigDecimal.valueOf(1.5);
+    public static final String PREFIX_CUSTOMER = "Rental Record for ";
+    public static final String PREFIX_TOTAL = "Amount owed is";
+    public static final String PREFIX_POINTS = "You earned";
 
-    // NEW movie
-    public static final BigDecimal RATE_NEW = BigDecimal.valueOf(3);
-
-    // CHILDREN movie
-    public static final BigDecimal BASE_AMOUNT_CHILDREN = BigDecimal.valueOf(1.5);
-    public static final int CHILDREN_DAYS_THRESHOLD = 3;
-    public static final BigDecimal EXTRA_RATE_CHILDREN = BigDecimal.valueOf(1.5);
-
-    // Rental processing error message
-    public static final String RENTAL_PROCESSING_ERROR = "\tError processing rental\t";
 }

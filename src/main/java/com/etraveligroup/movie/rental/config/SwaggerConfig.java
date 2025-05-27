@@ -8,7 +8,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-
+    /**
+     * Configures OpenAPI documentation for the Generate Invoice API.
+     * This configuration sets the title, description, version, and contact information for the API.
+     *
+     * @return OpenAPI instance with the configured information
+     * @author Suresh
+     * @version 1.0
+     * @since 1.0
+     */
     @Bean
     public OpenAPI matchmakingOpenAPI() {
         return new OpenAPI()

@@ -1,13 +1,13 @@
 package com.etraveligroup.movie.rental.service.impl;
 
-
-import com.etraveligroup.movie.rental.dto.CustomerRequestDTO;
+import com.etraveligroup.movie.rental.dto.GenerateInvoiceRequestDTO;
 import com.etraveligroup.movie.rental.entity.Customer;
 import com.etraveligroup.movie.rental.entity.Movie;
 import com.etraveligroup.movie.rental.entity.MovieRental;
+import com.etraveligroup.movie.rental.exceptions.CustomerNotFoundException;
 import com.etraveligroup.movie.rental.exceptions.RentalProcessingException;
+import com.etraveligroup.movie.rental.exceptions.RentalsNotFoundException;
 import com.etraveligroup.movie.rental.repository.CustomerRepository;
-import com.etraveligroup.movie.rental.repository.MovieRepository;
 import com.etraveligroup.movie.rental.service.RentalInfoService;
 import com.etraveligroup.movie.rental.util.InvoiceFormatter;
 import com.etraveligroup.movie.rental.util.PointsCalculator;
@@ -17,52 +17,65 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RentalServiceImpl implements RentalInfoService {
-    private final MovieRepository movieRepository;
     private final CustomerRepository customerRepository;
 
     @Override
-    @Async
-    @Transactional
-    @Retryable(
-            value = RentalProcessingException.class,
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000)
-    )
-    @Cacheable(value = "invoices", key = "#customerRequestDTO")
-    public CompletableFuture<String> generateInvoice(CustomerRequestDTO customerRequestDTO) {
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Retryable(retryFor = RentalProcessingException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Cacheable(value = "invoices", key = "#generateInvoiceRequestDTO.customerName()")
+    public Mono<String> generateInvoiceByName(final GenerateInvoiceRequestDTO generateInvoiceRequestDTO) {
+        return Mono.fromCallable(() -> {
+            log.info("Starting invoice generation for customer: {}", generateInvoiceRequestDTO.customerName());
+            Customer customer = customerRepository.findByName(generateInvoiceRequestDTO.customerName())
+                    .orElseThrow(() -> {
+                        log.error("Customer not found: {}", generateInvoiceRequestDTO.customerName());
+                        return new CustomerNotFoundException("Customer not found");
+                    });
 
-        log.info("Starting invoice generation for customer: {}", customerRequestDTO.name());
-
-        // In RentalServiceImpl.java
-        Optional<Customer> customerOptional = customerRepository.findByName(customerRequestDTO.name());
-        Customer customer = customerOptional.orElseThrow(() -> {
-            log.error("Customer not found: {}", customerRequestDTO.name());
-            return new IllegalArgumentException("Customer not found");
+            return generateInvoiceForCustomer(customer, generateInvoiceRequestDTO.customerName());
         });
+    }
 
+    @Override
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Retryable(retryFor = RentalProcessingException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Cacheable(value = "invoices", key = "#customerId")
+    public Mono<String> generateInvoiceById(Long customerId) {
+        return Mono.fromCallable(() -> {
+            log.info("Starting invoice generation for customer ID: {}", customerId);
+            Customer customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> {
+                        log.error("Customer not found with ID: {}", customerId);
+                        return new CustomerNotFoundException("Customer not found");
+                    });
+
+            return generateInvoiceForCustomer(customer, customer.getName());
+        });
+    }
+
+    private String generateInvoiceForCustomer(Customer customer, String customerName) {
         List<MovieRental> customerRentals = customer.getRentals();
         if (customerRentals == null || customerRentals.isEmpty()) {
-            log.warn("No rentals found for customer: {}", customerRequestDTO.name());
-            throw new IllegalArgumentException("No rentals found for customer");
+            log.warn("No rentals found for customer: {}", customerName);
+            throw new RentalsNotFoundException("No rentals found for customer");
         }
 
         BigDecimal totalAmount = BigDecimal.ZERO;
         int frequentRenterPoints = 0;
-        StringBuilder invoice = new StringBuilder(InvoiceFormatter.formatHeader(customerRequestDTO.name()));
+        StringBuilder invoice = new StringBuilder(InvoiceFormatter.formatHeader(customerName));
         List<String> errors = new ArrayList<>();
 
         for (MovieRental rental : customerRentals) {
@@ -93,8 +106,8 @@ public class RentalServiceImpl implements RentalInfoService {
         }
 
         invoice.append(InvoiceFormatter.formatFooter(totalAmount, frequentRenterPoints));
-        log.info("Invoice generation completed for customer: {} | Total: {} | Points: {}", customerRequestDTO.name(), totalAmount, frequentRenterPoints);
+        log.info("Invoice generation completed for customer: {} | Total: {} | Points: {}", customerName, totalAmount, frequentRenterPoints);
 
-        return CompletableFuture.completedFuture(invoice.toString());
+        return invoice.toString();
     }
 }

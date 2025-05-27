@@ -1,13 +1,11 @@
 package com.etraveligroup.movie.rental.exceptions;
 
-import java.io.Serial;
 
 /**
  * Exception thrown when a movie is not found for a given ID.
  */
 public class MovieNotFoundException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

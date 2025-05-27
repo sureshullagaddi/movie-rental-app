@@ -1,7 +1,6 @@
 package com.etraveligroup.movie.rental.util;
 
-import com.etraveligroup.movie.rental.enums.MovieType;
-
+import static com.etraveligroup.movie.rental.constants.MovieRentalConstants.*;
 
 public final class PointsCalculator {
 
@@ -13,6 +12,6 @@ public final class PointsCalculator {
         if (pricingCode == null) {
             throw new IllegalArgumentException("Pricing code must not be null");
         }
-        return ("new".equalsIgnoreCase(pricingCode) && daysRented > 2) ? 2 : 1;
+        return (NEW.equalsIgnoreCase(pricingCode) && daysRented > DAYS_RENTED_2) ? DAYS_RENTED_2 : DAYS_RENTED_1;
     }
 }

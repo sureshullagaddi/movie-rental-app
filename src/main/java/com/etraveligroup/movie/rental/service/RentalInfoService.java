@@ -1,6 +1,7 @@
 package com.etraveligroup.movie.rental.service;
 
-import com.etraveligroup.movie.rental.dto.CustomerRequestDTO;
+import com.etraveligroup.movie.rental.dto.GenerateInvoiceRequestDTO;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -10,10 +11,17 @@ import java.util.concurrent.CompletableFuture;
 public interface RentalInfoService {
 
     /**
-     * Generates an invoice for the given customer.
+     * Generates an invoice by customer.
      *
-     * @param customer the customer for whom to generate the invoice
+     * @param generateInvoiceRequestDTO the customer for whom to generate the invoice
      * @return the invoice as a string
      */
-    CompletableFuture<String> generateInvoice(CustomerRequestDTO customer);
+    Mono<String> generateInvoiceByName(GenerateInvoiceRequestDTO generateInvoiceRequestDTO);
+    /**
+     * Generates an invoice by customer ID.
+     *
+     * @param customerId the customer ID for whom to generate the invoice
+     * @return the invoice as a string
+     */
+    Mono<String> generateInvoiceById(Long customerId);
 }

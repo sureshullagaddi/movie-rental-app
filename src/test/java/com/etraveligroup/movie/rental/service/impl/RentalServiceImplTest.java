@@ -1,18 +1,21 @@
 package com.etraveligroup.movie.rental.service.impl;
 
-import com.etraveligroup.movie.rental.dto.CustomerRequestDTO;
-import com.etraveligroup.movie.rental.dto.MovieRentalDTO;
+import com.etraveligroup.movie.rental.dto.GenerateInvoiceRequestDTO;
+import com.etraveligroup.movie.rental.entity.Customer;
 import com.etraveligroup.movie.rental.entity.Movie;
+import com.etraveligroup.movie.rental.entity.MoviePricing;
+import com.etraveligroup.movie.rental.entity.MovieRental;
+import com.etraveligroup.movie.rental.exceptions.CustomerNotFoundException;
 import com.etraveligroup.movie.rental.exceptions.RentalProcessingException;
-import com.etraveligroup.movie.rental.repository.MovieRepository;
-import com.etraveligroup.movie.rental.util.PointsCalculator;
-import com.etraveligroup.movie.rental.util.RentalValidator;
-import org.junit.jupiter.api.BeforeEach;
+import com.etraveligroup.movie.rental.exceptions.RentalsNotFoundException;
+import com.etraveligroup.movie.rental.repository.CustomerRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,77 +26,209 @@ import static org.mockito.Mockito.*;
 class RentalServiceImplTest {
 
     @Mock
-    private MovieRepository movieRepository;
+    private CustomerRepository customerRepository;
 
     @InjectMocks
     private RentalServiceImpl rentalService;
 
-    private Movie movie;
-    private MovieRentalDTO rentalDTO;
-    private CustomerRequestDTO customerDTO;
+    @Test
+    void generateInvoiceByName_successful() {
+        String customerName = "John Doe";
+        GenerateInvoiceRequestDTO dto = new GenerateInvoiceRequestDTO(customerName);
 
-    @BeforeEach
-    void setUp() {
-        movie = new Movie();
-        movie.setId("M1");
-        movie.setTitle("Test Movie");
-        movie.setMovieType("REGULAR");
+        MoviePricing pricing = new MoviePricing();
+        pricing.setCode("regular");
+        pricing.setBaseDays(2);
+        pricing.setBasePrice(BigDecimal.valueOf(2.0));
+        pricing.setExtraPricePerDay(BigDecimal.valueOf(1.5));
 
-        rentalDTO = new MovieRentalDTO("M1", 3);
-        customerDTO = new CustomerRequestDTO("John Doe", List.of(rentalDTO));
+        Movie movie = new Movie();
+        movie.setId("F001");
+        movie.setTitle("You've Got Mail");
+        movie.setPricing(pricing);
+
+        MovieRental rental = new MovieRental();
+        rental.setMovie(movie);
+        rental.setDays(3);
+
+        Customer customer = new Customer();
+        customer.setName(customerName);
+        customer.setRentals(List.of(rental));
+
+        when(customerRepository.findByName(customerName)).thenReturn(Optional.of(customer));
+
+        String invoice = rentalService.generateInvoiceByName(dto).block();
+
+        assertNotNull(invoice);
+        assertTrue(invoice.contains(customerName));
+        assertTrue(invoice.contains(movie.getTitle()));
     }
 
     @Test
-    void generateInvoice_successful() {
-        when(movieRepository.findById("M1")).thenReturn(Optional.of(movie));
+    void generateInvoiceByName_customerNotFound() {
+        String customerName = "Unknown";
+        GenerateInvoiceRequestDTO dto = new GenerateInvoiceRequestDTO(customerName);
+        when(customerRepository.findByName(customerName)).thenReturn(Optional.empty());
 
-        rentalService.generateInvoice(customerDTO);
-        verify(movieRepository, times(1)).findById("M1");
+        assertThrows(CustomerNotFoundException.class, () -> rentalService.generateInvoiceByName(dto).block());
     }
 
     @Test
-    void generateInvoice_noRentals_throwsException() {
-        CustomerRequestDTO emptyCustomer = new CustomerRequestDTO("Jane", List.of());
+    void generateInvoiceByName_noRentals() {
+        String customerName = "No Rentals";
+        GenerateInvoiceRequestDTO dto = new GenerateInvoiceRequestDTO(customerName);
+        Customer customer = new Customer();
+        customer.setName(customerName);
+        customer.setRentals(List.of());
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> rentalService.generateInvoice(emptyCustomer));
-        assertTrue(ex.getMessage().contains("No rentals to process"));
+        when(customerRepository.findByName(customerName)).thenReturn(Optional.of(customer));
+
+        assertThrows(RentalsNotFoundException.class, () -> rentalService.generateInvoiceByName(dto).block());
     }
 
     @Test
-    void generateInvoice_movieNotFound_throwsRentalProcessingException() {
-        when(movieRepository.findById("M1")).thenReturn(Optional.empty());
+    void generateInvoiceByName_rentalWithInvalidData() {
+        String customerName = "Invalid Rental";
+        GenerateInvoiceRequestDTO dto = new GenerateInvoiceRequestDTO(customerName);
 
-        RentalProcessingException ex = assertThrows(RentalProcessingException.class,
-                () -> rentalService.generateInvoice(customerDTO));
-        assertTrue(ex.getMessage().contains("Invoice generation failed"));
+        Movie movie = new Movie();
+        movie.setId("F002");
+        movie.setTitle("Matrix");
+        movie.setPricing(null);
+
+        MovieRental rental = new MovieRental();
+        rental.setMovie(movie);
+        rental.setDays(2);
+
+        Customer customer = new Customer();
+        customer.setName(customerName);
+        customer.setRentals(List.of(rental));
+
+        when(customerRepository.findByName(customerName)).thenReturn(Optional.of(customer));
+
+        assertThrows(IllegalArgumentException.class, () -> rentalService.generateInvoiceByName(dto).block());
     }
 
     @Test
-    void generateInvoice_invalidRental_throwsIllegalArgumentException() {
-        // Simulate RentalValidator throwing IllegalArgumentException
-        try (MockedStatic<RentalValidator> validatorMock = mockStatic(RentalValidator.class)) {
-            validatorMock.when(() -> RentalValidator.validateRental(any())).thenThrow(new IllegalArgumentException("Invalid rental"));
+    void generateInvoiceByName_rentalWithUnexpectedException() {
+        String customerName = "Unexpected Error";
+        GenerateInvoiceRequestDTO dto = new GenerateInvoiceRequestDTO(customerName);
 
-            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                    () -> rentalService.generateInvoice(customerDTO));
-            assertTrue(ex.getMessage().contains("Invalid rental data"));
-        }
+        MoviePricing pricing = new MoviePricing();
+        pricing.setCode("regular");
+        pricing.setBaseDays(2);
+        pricing.setBasePrice(BigDecimal.valueOf(2.0));
+        pricing.setExtraPricePerDay(BigDecimal.valueOf(1.5));
+
+        Movie movie = new Movie();
+        movie.setId("F003");
+        movie.setTitle("Cars");
+        movie.setPricing(pricing);
+
+        MovieRental rental = spy(new MovieRental());
+        rental.setMovie(movie);
+        rental.setDays(2);
+
+        doThrow(new RuntimeException("DB error")).when(rental).getMovie();
+
+        Customer customer = new Customer();
+        customer.setName(customerName);
+        customer.setRentals(List.of(rental));
+
+        when(customerRepository.findByName(customerName)).thenReturn(Optional.of(customer));
+
+        assertThrows(RentalProcessingException.class, () -> rentalService.generateInvoiceByName(dto).block());
     }
 
     @Test
-    void generateInvoice_unexpectedException_throwsRentalProcessingException() {
-        // Simulate unexpected exception in PointsCalculator
-        try (MockedStatic<RentalValidator> validatorMock = mockStatic(RentalValidator.class);
-             MockedStatic<PointsCalculator> pointsMock = mockStatic(PointsCalculator.class)) {
-            validatorMock.when(() -> RentalValidator.validateRental(any())).thenCallRealMethod();
-            when(movieRepository.findById("M1")).thenReturn(Optional.of(movie));
-            pointsMock.when(() -> PointsCalculator.calculateFrequentRenterPoints(any(), anyInt()))
-                    .thenThrow(new RuntimeException("Unexpected error"));
+    void generateInvoiceById_successful() {
+        Long customerId = 1L;
 
-            RentalProcessingException ex = assertThrows(RentalProcessingException.class,
-                    () -> rentalService.generateInvoice(customerDTO));
-            assertTrue(ex.getMessage().contains("Invoice generation failed"));
-        }
+        MoviePricing pricing = new MoviePricing();
+        pricing.setCode("regular");
+        pricing.setBaseDays(2);
+        pricing.setBasePrice(BigDecimal.valueOf(2.0));
+        pricing.setExtraPricePerDay(BigDecimal.valueOf(1.5));
+
+        Movie movie = new Movie();
+        movie.setId("F001");
+        movie.setTitle("You've Got Mail");
+        movie.setPricing(pricing);
+
+        MovieRental rental = new MovieRental();
+        rental.setMovie(movie);
+        rental.setDays(3);
+
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setName("John Doe");
+        customer.setRentals(List.of(rental));
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        String invoice = rentalService.generateInvoiceById(customerId).block();
+
+        assertNotNull(invoice);
+        assertTrue(invoice.contains(customer.getName()));
+        assertTrue(invoice.contains(movie.getTitle()));
+    }
+
+    @Test
+    void generateInvoiceById_customerNotFound() {
+        Long customerId = 99L;
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        assertThrows(CustomerNotFoundException.class, () -> rentalService.generateInvoiceById(customerId).block());
+    }
+
+    @Test
+    void generateInvoiceById_noRentals() {
+        Long customerId = 2L;
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setName("No Rentals");
+        customer.setRentals(List.of());
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        assertThrows(RentalsNotFoundException.class, () -> rentalService.generateInvoiceById(customerId).block());
+    }
+
+    @Test
+    void generateInvoiceById_multipleRentals_oneWithError() {
+        Long customerId = 3L;
+
+        MoviePricing pricing = new MoviePricing();
+        pricing.setCode("regular");
+        pricing.setBaseDays(2);
+        pricing.setBasePrice(BigDecimal.valueOf(2.0));
+        pricing.setExtraPricePerDay(BigDecimal.valueOf(1.5));
+
+        Movie movie1 = new Movie();
+        movie1.setId("F001");
+        movie1.setTitle("You've Got Mail");
+        movie1.setPricing(pricing);
+
+        MovieRental rental1 = new MovieRental();
+        rental1.setMovie(movie1);
+        rental1.setDays(3);
+
+        Movie movie2 = new Movie();
+        movie2.setId("F999");
+        movie2.setTitle("Broken Movie");
+        movie2.setPricing(null);
+
+        MovieRental rental2 = new MovieRental();
+        rental2.setMovie(movie2);
+        rental2.setDays(2);
+
+        Customer customer = new Customer();
+        customer.setId(customerId);
+        customer.setName("John Doe");
+        customer.setRentals(List.of(rental1, rental2));
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        assertThrows(RentalProcessingException.class, () -> rentalService.generateInvoiceById(customerId).block());
     }
 }

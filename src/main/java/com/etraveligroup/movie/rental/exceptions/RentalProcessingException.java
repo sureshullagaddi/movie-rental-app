@@ -15,6 +15,7 @@ public class RentalProcessingException extends RuntimeException {
 
     /**
      * Constructs a new RentalProcessingException with the specified message.
+     *
      * @param message
      * @param errors
      */
@@ -22,6 +23,7 @@ public class RentalProcessingException extends RuntimeException {
         super(message);
         this.errors = errors;
     }
+
     public List<String> getErrors() {
         return errors;
     }

@@ -46,6 +46,17 @@ dependencies {
 	//MariaDB Database dependency
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
 
+	//pdf generation dependency
+	implementation 'com.itextpdf:kernel:8.0.2'
+	implementation 'com.itextpdf:layout:8.0.2'
+
+	// Cache Dependencies
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'com.github.ben-manes.caffeine:caffeine'
+
+	// Reactive Dependencies
+	implementation 'io.projectreactor:reactor-core:3.6.6'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	//Logging Dependencies
 	compileOnly 'org.projectlombok:lombok'
