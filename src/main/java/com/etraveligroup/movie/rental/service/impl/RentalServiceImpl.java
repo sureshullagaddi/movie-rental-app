@@ -26,6 +26,14 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * RentalServiceImpl provides the implementation for generating invoices based on customer rentals.
+ * It retrieves customer data from the repository and processes their rentals to generate an invoice.
+ *
+ * @author Suresh
+ * @version 1.0
+ * @since 1.0
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -33,6 +41,16 @@ public class RentalServiceImpl implements RentalInfoService {
 
     private final CustomerRepository customerRepository;
 
+    /**
+     * Generates an invoice for a customer based on their name.
+     * It retrieves the customer by name, processes their rentals, and generates an invoice.
+     *
+     * @param generateInvoiceRequestDTO DTO containing the customer name for invoice generation
+     * @return Mono<String> containing the generated invoice as a string
+     * @throws CustomerNotFoundException if the customer with the given name does not exist
+     * @throws RentalsNotFoundException  if the customer has no rentals
+     * @throws RentalProcessingException if there is an error during the rental processing
+     */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Cacheable(value = "invoices", key = "#generateInvoiceRequestDTO.customerName()")
@@ -49,6 +67,17 @@ public class RentalServiceImpl implements RentalInfoService {
                 .flatMap(customer -> generateInvoiceForCustomerWithRetry(customer, generateInvoiceRequestDTO.customerName()));
     }
 
+
+    /**
+     * Generates an invoice for a customer based on their ID.
+     * It retrieves the customer by ID, processes their rentals, and generates an invoice.
+     *
+     * @param customerId the ID of the customer for whom the invoice is to be generated
+     * @return Mono<String> containing the generated invoice as a string
+     * @throws CustomerNotFoundException if the customer with the given ID does not exist
+     * @throws RentalsNotFoundException  if the customer has no rentals
+     * @throws RentalProcessingException if there is an error during the rental processing
+     */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     @Cacheable(value = "invoices", key = "#customerId")
@@ -65,6 +94,15 @@ public class RentalServiceImpl implements RentalInfoService {
                 .flatMap(customer -> generateInvoiceForCustomerWithRetry(customer, customer.getName()));
     }
 
+
+    /**
+     * Generates an invoice for a customer with retry logic in case of rental processing errors.
+     * It attempts to generate the invoice up to 2 times with a backoff strategy.
+     * @param customer     the customer for whom the invoice is to be generated
+     * @param customerName the name of the customer for logging purposes
+     * @return Mono<String> containing the generated invoice as a string
+     * @throws RentalProcessingException if all retry attempts fail
+     */
     private Mono<String> generateInvoiceForCustomerWithRetry(final Customer customer, final String customerName) {
         final AtomicInteger attempt = new AtomicInteger(1);
         return Mono.fromCallable(() -> {
@@ -82,6 +120,15 @@ public class RentalServiceImpl implements RentalInfoService {
                 });
     }
 
+    /**
+     * Generates an invoice for a customer by processing their rentals.
+     * It calculates the total amount and frequent renter points based on the rentals.
+     * @param customer the customer for whom the invoice is to be generated
+     * @param customerName the name of the customer for logging purposes
+     * @return String containing the formatted invoice
+     * @throws RentalsNotFoundException if the customer has no rentals
+     * @throws IllegalArgumentException if there is an error in rental data validation
+     */
     private String generateInvoiceForCustomer(final Customer customer, final String customerName) {
         final List<MovieRental> customerRentals = customer.getRentals();
         if (customerRentals == null || customerRentals.isEmpty()) {
