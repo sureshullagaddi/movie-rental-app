@@ -1,0 +1,93 @@
+{
+	"info": {
+		"_postman_id": "2fa6162f-51d8-4adb-a377-a337d0490835",
+		"name": "MovieRentalApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "845759"
+	},
+	"item": [
+		{
+			"name": "InvoiceByName",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/pdf",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customerName\": \"John Doe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/generate/invoice",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"generate",
+						"invoice"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "InvoicById",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/pdf",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/generate/invoice/by-id/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"generate",
+						"invoice",
+						"by-id",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

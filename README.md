@@ -32,11 +32,17 @@ The application processes rental data and calculates charges and reward points f
 - Build Tool: Gradle
 - Libraries Used:
     - Unit Testing: JUnit 5, Extended Mockito
+    - Lombok: For reducing boilerplate code
     - Storage: H2 Database
     - Template PDF: OpenHTMLToPDF
     - Cache: Caffeine (lightweight)
     - Reactive Programming (Non-blocking): WebFlux
     - Reactive Retry Logic: Retries up to 3 times if invoice generation fails
+    - API Documentation: Swagger
+    - API Testing: Postman
+    - Dependency Injection: Spring Framework
+    - Logging: SLF4J with Logback
+    - Version Control: Git
 
 ## Getting Started
 
