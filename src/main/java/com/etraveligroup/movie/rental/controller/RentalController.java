@@ -24,6 +24,14 @@ import java.util.Map;
 
 import static com.etraveligroup.movie.rental.constants.MovieRentalConstants.*;
 
+/**
+ * RentalController handles requests related to generating invoices for movie rentals.
+ * It provides endpoints to generate invoices by customer name or ID.
+ *
+ * @author Suresh
+ * @version 1.0
+ * @since 1.0
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/generate")
@@ -59,7 +67,8 @@ public class RentalController {
 
     /**
      * Generates an invoice based on the customer ID.
-     * @param customerId the ID of the customer for whom the invoice is to be generated
+     *
+     * @param customerId   the ID of the customer for whom the invoice is to be generated
      * @param acceptHeader the Accept header to determine response format
      * @return Mono<ResponseEntity < Object>> containing the generated invoice in the requested format
      * @throws IllegalArgumentException if the customer ID is null or not positive
@@ -76,6 +85,14 @@ public class RentalController {
                 .doOnError(e -> log.error("Error generating invoice for {}{}", CUSTOMER_ID_LABEL, customerId, e));
     }
 
+    /**
+     * Builds the response entity for the generated invoice based on the requested format.
+     * @param invoiceText  the generated invoice text
+     * @param acceptHeader the Accept header to determine response format
+     * @param customerName the name of the customer (if available)
+     * @param customerId   the ID of the customer (if available)
+     * @return ResponseEntity containing the invoice in the requested format
+     */
     private ResponseEntity<Object> buildInvoiceResponse(String invoiceText, String acceptHeader, String customerName, Long customerId) {
         String label = customerName != null ? CUSTOMER_LABEL + customerName : CUSTOMER_ID_LABEL + customerId;
         if (invoiceText == null) {
