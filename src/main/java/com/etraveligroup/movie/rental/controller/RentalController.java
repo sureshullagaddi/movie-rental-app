@@ -35,6 +35,16 @@ public class RentalController {
     private final RentalInfoService rentalInfoService;
     private final PdfGenerateService pdfGeneratorService;
 
+    /**
+     * Generates an invoice based on the customer name or ID.
+     * If the request contains a customer name, it generates an invoice by name.
+     * If the request contains a customer ID, it generates an invoice by ID.
+     *
+     * @param generateInvoiceByNameDTO DTO containing customer name for invoice generation
+     * @param acceptHeader             the Accept header to determine response format
+     * @return Mono<ResponseEntity < Object>> containing the generated invoice in the requested format
+     * @throws IllegalArgumentException if the customer name is null or empty
+     */
     @PostMapping(value = "/invoice", produces = {MediaType.TEXT_PLAIN_VALUE, MediaType.APPLICATION_PDF_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "Generates invoice by customer name")
     public Mono<ResponseEntity<Object>> generateInvoice(
@@ -47,6 +57,13 @@ public class RentalController {
                 .doOnError(e -> log.error("Error generating invoice for {}{}", CUSTOMER_LABEL, generateInvoiceByNameDTO.customerName(), e));
     }
 
+    /**
+     * Generates an invoice based on the customer ID.
+     * @param customerId the ID of the customer for whom the invoice is to be generated
+     * @param acceptHeader the Accept header to determine response format
+     * @return Mono<ResponseEntity < Object>> containing the generated invoice in the requested format
+     * @throws IllegalArgumentException if the customer ID is null or not positive
+     */
     @GetMapping(value = "/invoice/{customerId}", produces = {MediaType.TEXT_PLAIN_VALUE, MediaType.APPLICATION_PDF_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @Operation(summary = "Generates invoice by customer ID")
     public Mono<ResponseEntity<Object>> generateInvoiceById(
