@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
 
-	//Spring Boot Starter Dependencies
+	//Spring Boot Starter Dependencies and Web Dependencies
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 

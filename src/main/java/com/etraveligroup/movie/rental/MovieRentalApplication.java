@@ -12,8 +12,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @SpringBootApplication
 public class MovieRentalApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MovieRentalApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(MovieRentalApplication.class, args);
+    }
 }

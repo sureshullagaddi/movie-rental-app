@@ -1,5 +1,7 @@
 package com.etraveligroup.movie.rental.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 import static com.etraveligroup.movie.rental.constants.MovieRentalConstants.*;
 
 /**
@@ -10,6 +12,7 @@ import static com.etraveligroup.movie.rental.constants.MovieRentalConstants.*;
  * @version 1.0
  * @since 1.0
  */
+@Slf4j
 public final class PointsCalculator {
 
     private PointsCalculator() {
@@ -18,9 +21,11 @@ public final class PointsCalculator {
 
     public static int calculateFrequentRenterPoints(String pricingCode, int daysRented) {
         if (pricingCode == null) {
+            log.error("Pricing code must not be null");
             throw new IllegalArgumentException("Pricing code must not be null");
         }
-        // Validate the number of days rented for the NEW pricing code
-        return (NEW.equalsIgnoreCase(pricingCode) && daysRented >= DAYS_RENTED_2) ? DAYS_RENTED_2 : DAYS_RENTED_1;
+        int points = (NEW.equalsIgnoreCase(pricingCode) && daysRented >= DAYS_RENTED_2) ? DAYS_RENTED_2 : DAYS_RENTED_1;
+        log.debug("Calculated frequent renter points: pricingCode={}, daysRented={}, points={}", pricingCode, daysRented, points);
+        return points;
     }
 }

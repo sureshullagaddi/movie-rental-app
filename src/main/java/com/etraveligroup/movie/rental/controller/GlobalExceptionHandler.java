@@ -3,11 +3,14 @@ package com.etraveligroup.movie.rental.controller;
 import com.etraveligroup.movie.rental.exceptions.*;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.HashMap;
@@ -28,6 +31,22 @@ import java.util.stream.Collectors;
 @Tag(name = "Internal", description = "Internal controller for handling exceptions")
 @Hidden // This controller is not exposed in the API documentation
 public class GlobalExceptionHandler {
+
+    /**
+     * Handles constraint violation exceptions.
+     * This method captures validation errors that occur when constraints on method parameters are violated.
+     * * @param ex the ConstraintViolationException containing validation errors
+     * * @return a ResponseEntity with a bad request status and a map of error messages
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getConstraintViolations().forEach(cv ->
+                errors.put("error", cv.getMessage())
+        );
+        return ResponseEntity.badRequest().body(errors);
+    }
 
     /**
      * Handles validation errors for method arguments.
@@ -144,6 +163,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PdfGenerationException.class)
     public ResponseEntity<String> handleIllegalArgument(PdfGenerationException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.web.servlet.NoHandlerFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handleNotFound(NoHandlerFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Required path variable 'customerId' is missing or URL is incorrect.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
 }
