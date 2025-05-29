@@ -6,6 +6,13 @@ The application processes rental data and calculates charges and reward points f
 ## API Reference
 
 - http://localhost:8080/swagger-ui/index.html#/
+- As for the assignment I have added 2 end points 
+    - `/api/rental/invoice/{customerId}`: Generates an invoice for a specific customer based on their ID.
+    - `/api/rental/invoice`: Generates an invoice for a specific customer based on their name.
+    - The API supports three media types for responses:
+        - `text/plain`: Returns a plain text invoice.
+        - `application/json`: Returns a JSON representation of the invoice.
+        - `application/pdf`: Returns a PDF document of the invoice.
 
 ## Features
 
@@ -25,11 +32,17 @@ The application processes rental data and calculates charges and reward points f
 - application/pdf - used OpenHTMLToPDF to generate PDF invoices from HTML templates, allowing for rich formatting and layout control.
   parse the text into a Java object.
 
+- For data storage, used H2 in-memory database for simplicity and ease of testing, assignment requirements, and quick setup.
+    - H2 is lightweight and easy to configure, making it suitable for development and testing purposes.
+    - It supports SQL queries, which allows for easy data manipulation and retrieval.
+- Later we can easily switch to a more robust database like MySQL or PostgreSQL if needed since used JPA for data access.
+- I have modeled the database schema using Entity-Relationship (ER) diagrams to visualize the relationships between entities using ER diagrams.
 ### ER Diagrams
 ![ER Diagram](images/customer.png)
 ![ER Diagram](images/movie.png)
 ![ER Diagram](images/movie-pricing.png)
 ![ER Diagram](images/movie-rental.png)
+
 
 ## Technologies Used
 
