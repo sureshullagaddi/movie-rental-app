@@ -6,7 +6,7 @@ The application processes rental data and calculates charges and reward points f
 ## API Reference
 
 - http://localhost:8080/swagger-ui/index.html#/
-- As for the assignment I have added 2 end points 
+- After analysis, the following RESTful API endpoints were created to handle invoice generation:
     - `/api/rental/invoice/{customerId}`: Generates an invoice for a specific customer based on their ID.
     - `/api/rental/invoice`: Generates an invoice for a specific customer based on their name.
     - The API supports three media types for responses:
