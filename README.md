@@ -16,8 +16,8 @@ The application processes rental data and calculates charges and reward points f
 
 ## Design Decisions
 
-- Initially, the system was planned to be implemented using core Java for simplicity and direct control over the logic.
-- However, the approach was later shifted to building a RESTful API to enhance scalability, modularity, and integration with modern front-end frameworks.
+- The system was planned to be implemented using Java, Builder design pattern for simplicity and later thought to use StringBuilder and String format because dynamically builds the report and gives performance and flexibility.
+- Built a RESTful API to enhance scalability, modularity, and integration with modern front-end frameworks/ other services.
 
 ### ER Diagrams
 ![ER Diagram](images/customer.png)
@@ -31,6 +31,7 @@ The application processes rental data and calculates charges and reward points f
 - Frameworks: Spring Boot 3.5.0, JPA
 - Build Tool: Gradle
 - Libraries Used:
+    - Used StringBuilder and String format for dynamic report generation.
     - Unit Testing: JUnit 5, Extended Mockito
     - Lombok: For reducing boilerplate code
     - Storage: H2 Database
