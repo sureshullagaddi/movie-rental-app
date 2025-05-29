@@ -18,6 +18,12 @@ The application processes rental data and calculates charges and reward points f
 
 - The system was planned to be implemented using Java, Builder design pattern for simplicity and later thought to use StringBuilder and String format because dynamically builds the report and gives performance and flexibility.
 - Built a RESTful API to enhance scalability, modularity, and integration with modern front-end frameworks/ other services.
+- text/plain - used StringBuilder and String format for dynamic report generation.
+
+- application/json - used JSON for structured data representation.
+    - Since invoice format is semi-structured and consistent, the best approach is: parse the text into a Java object using DTO, This gives you full control, error handling, and clean output.
+- application/pdf - used OpenHTMLToPDF to generate PDF invoices from HTML templates, allowing for rich formatting and layout control.
+  parse the text into a Java object.
 
 ### ER Diagrams
 ![ER Diagram](images/customer.png)
