@@ -1,6 +1,7 @@
 package com.etraveligroup.movie.rental.service.impl;
 
 import com.etraveligroup.movie.rental.dto.InvoiceResponseDTO;
+import com.etraveligroup.movie.rental.exceptions.PdfGenerationException;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class PdfGenerateService {
             return out.toByteArray();
         } catch (Exception e) {
             log.error("Failed to generate PDF from HTML for invoice: {}", invoice != null ? invoice.customer() : "null", e);
-            throw new RuntimeException("Failed to generate PDF from HTML", e);
+            throw new PdfGenerationException("Failed to generate PDF from HTML", e);
         }
     }
 }
