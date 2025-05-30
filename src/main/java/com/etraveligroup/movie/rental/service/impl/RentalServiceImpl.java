@@ -155,6 +155,9 @@ public class RentalServiceImpl implements RentalInfoService {
             } catch (final IllegalArgumentException e) {
                 log.error("Validation failed for rental with movie ID {}: {}", rental.getMovie().getId(), e.getMessage());
                 throw new IllegalArgumentException("Invalid rental data: " + e.getMessage(), e);
+            } catch (final Exception e) {
+                log.error("Unexpected error during invoice generation for customer: {}", customerName, e);
+                throw new RentalProcessingException("Unexpected error during invoice generation: " + e.getMessage(), List.of(e.getMessage()));
             }
         }
 

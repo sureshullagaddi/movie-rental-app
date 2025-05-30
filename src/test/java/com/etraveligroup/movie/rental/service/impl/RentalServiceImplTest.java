@@ -6,7 +6,6 @@ import com.etraveligroup.movie.rental.entity.Movie;
 import com.etraveligroup.movie.rental.entity.MoviePricing;
 import com.etraveligroup.movie.rental.entity.MovieRental;
 import com.etraveligroup.movie.rental.exceptions.CustomerNotFoundException;
-import com.etraveligroup.movie.rental.exceptions.RentalsNotFoundException;
 import com.etraveligroup.movie.rental.repository.CustomerRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,7 +84,7 @@ class RentalServiceImplTest {
         when(customerRepository.findByName(customerName)).thenReturn(Optional.of(customer));
 
         Mono<String> result = rentalService.generateInvoiceByName(dto);
-        assertThrows(RentalsNotFoundException.class, result::block);
+        assertThrows(com.etraveligroup.movie.rental.exceptions.RentalsNotFoundException.class, result::block);
     }
 
 
@@ -117,8 +116,9 @@ class RentalServiceImplTest {
 
         when(customerRepository.findByName(customerName)).thenReturn(Optional.of(customer));
 
-        Mono<String> result = rentalService.generateInvoiceByName(dto);
-        assertThrows(RuntimeException.class, result::block);
+        String result = rentalService.generateInvoiceByName(dto).block();
+        assertNotNull(result);
+        assertTrue(result.startsWith("Invoice generation failed after retries:"));
     }
 
     @Test
@@ -174,6 +174,6 @@ class RentalServiceImplTest {
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         Mono<String> result = rentalService.generateInvoiceById(customerId);
-        assertThrows(RentalsNotFoundException.class, result::block);
+        assertThrows(com.etraveligroup.movie.rental.exceptions.RentalsNotFoundException.class, result::block);
     }
 }
